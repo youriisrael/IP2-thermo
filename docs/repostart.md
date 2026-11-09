@@ -1,6 +1,10 @@
 
 # Start je eigen repository
+<<<<<<< HEAD
 het werkt wel
+=======
+trest met sve
+>>>>>>> 5b877a2b57b10379976b1a9cea62035f87a5d3ec
 
 ## Instructies voor de repository-eigenaar
 1. Ga naar de [repository](https://github.com/Contemporary-Physicslab/gitintro)
