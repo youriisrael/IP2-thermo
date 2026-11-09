@@ -1,6 +1,6 @@
 
 # Start je eigen repository
-halllo
+wrm erkt dit niet
 
 ## Instructies voor de repository-eigenaar
 1. Ga naar de [repository](https://github.com/Contemporary-Physicslab/gitintro)
