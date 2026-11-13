@@ -14,6 +14,28 @@ Als startopdracht modelleren we twee fietsers. Doorloop de bovenstaande drie sta
 
 
 
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+T_start = 0
+T_eind = 10
+
+mf1 = 80
+mf2 = 90
+
+sf1 = 7
+sf2 = 5
+
+tijd = np.linspace(T_start,T_eind,1000)
+
+pf1 = sf1 * tijd
+pf2 = sf2 * tijd
+
+plt.plot(tijd,pf1)
+plt.plot(tijd,pf2)
+plt.show()
+```
 
 ## Numerieke modellen
 Om een simulatie te maken, splitsen we het volledige proces op in kleine stappen met een vaste (tijd)interval, zoals in onderstaande figuur. Elk stapje krijgt een nummer, van $0$ tot $N$. We gebruiken de letter $i$ om naar een specifieke stap te verwijzen.
