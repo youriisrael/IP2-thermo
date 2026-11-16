@@ -99,6 +99,27 @@ Wat op zou kunnen vallen is dat de snelheid in een cel constant gehouden wordt (
 Maak het tijdsinterval $dt$ groter en vergelijk de afgelegde weg in de tien seconde. Wat gebeurt er met de afgelegde weg als we $dt$ groter maken? Is dat logisch vanuit gezien de natuurkunde? En gezien de methode van discretisatie? Leg uit.
 ```
 
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Beginwaarden
+dT = 1                  #s
+t_eind = 10                   #s
+n = int(t_eind/dT)+1
+T = np.arange(0,t_eind+dT,dT) #s
+
+x1 = np.zeros(n)          #m     
+v1 = np.zeros(n)          #m/s     
+a1 = .5                   #m/s^2     
+
+# Uitvoeren van de simulatie
+for i in range(0,n-1):   
+    x1[i+1] = x1[i] + v1[i]*dT
+    v1[i+1] = v1[i] + a1*dT
+
+print(f"De afgelegde weg was met dt = 0,25 is {x_2[N-1]:.3g}m, en is met dt = 1 is {x1[n-1]:.3g}m dit is kleiner \n natuurkunig gezien klopt dit niet want het zou de zelfde afstand moeten zijn \n vanuit discretisatie klopt het wel, het is een andere formule met dus een andere uitkomst")
+```
 
 <!-- Jouw antwoord hier  -->
 
@@ -119,6 +140,8 @@ Een *class* is een blauwdruk voor het creëren van objecten (zoals deeltjes, ato
 # Merk op dat de class zelf geen deeltje is! 
 # Een object dat tot een bepaalde class behoort, wordt een instant van die class genoemd. 
 # Je kunt meerdere instants van een class hebben.
+import numpy as np
+
 
 class ParticleClass:
     def __init__(self, m, v, r, R):
@@ -177,6 +200,7 @@ print("Huidige position van that_particle " + str(that_particle.r))
 
 # oproepen van de functie 'update_position' met dt = 2.0 seconde
 that_particle.update_position(2.0)
+this_particle.update_position(2.0)
 print("Nieuwe positie van this_particle " + str(this_particle.r))
 print("Nieuwe positie van that_particle " + str(that_particle.r))
 ```
