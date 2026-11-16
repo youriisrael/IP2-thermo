@@ -32,8 +32,8 @@ tijd = np.linspace(T_start,T_eind,1000)
 pf1 = sf1 * tijd
 pf2 = sf2 * tijd
 
-plt.plot(tijd,pf1)
-plt.plot(tijd,pf2)
+plt.plot(tijd, pf1)
+plt.plot(tijd, pf2)
 plt.show()
 ```
 
