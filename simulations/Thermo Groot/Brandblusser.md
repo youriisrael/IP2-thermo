@@ -275,15 +275,6 @@ $$
 T_1^\gamma P_1^{1-\gamma} = T_2^\gamma P_2^{1-\gamma}.
 $$
 
-Samen met Gay-Lussac ($P_2/T_2 = P_3/T_3$), $T_1 = T_3$ en $P_2 = P_{atm}$ geeft
-$T_1/T_2 = P_3/P_{atm}$. Invullen en de logaritme nemen:
-
-$$
-\gamma \ln\frac{P_3}{P_{atm}} = (\gamma - 1)\ln\frac{P_1}{P_{atm}}
-\quad\Rightarrow\quad
-\gamma = \frac{\ln P_1 - \ln P_{atm}}{\ln P_1 - \ln P_3}.
-$$
-
 
 
 Het tweede deel van het proces, het toenemen van de druk door verhogen van de temperatuur kan beschreven worden met de wet van Gay-Lussac:
@@ -309,7 +300,7 @@ $$
 ```
 
 ```{code-cell} ipython3
-### Jouw code
+2. Zodat de temperatuur daalt tot de kamer temperatuur
 ```
 
 ```python
@@ -319,73 +310,26 @@ import matplotlib.pyplot as plt
 data = np.genfromtxt('bb_15_06_2bar.csv', delimiter=',', skip_header=1, invalid_raise=False)
 t = data[:, 0] / 1000      # tijd [s]
 U = data[:, 1]             # sensorwaarde [ADC]
-
-# ijking van de druksensor (uit de meting met de spuit)
-a, b = 501, -25332         # P = a U + b  [Pa]
-P = a * U + b
-
-# drie drukken aflezen
-P_atm = np.mean(P[t < 105])                    # voor het oppompen
-P1    = np.mean(P[(t > 225) & (t < 231.6)])    # vlak voor het leeglaten
-P3    = np.max(P[(t > 233) & (t < 316)])       # hoogste druk na het sluiten
-
-gamma = (np.log(P1) - np.log(P_atm)) / (np.log(P1) - np.log(P3))
-print(f"P_atm = {P_atm/1e3:.1f} kPa, P1 = {P1/1e3:.1f} kPa, P3 = {P3/1e3:.1f} kPa")
-print(f"gamma = {gamma:.2f}")
-
-plt.plot(t, P/1e3, 'b-')
-plt.axhline(P_atm/1e3, color='gray', ls='--', label='$P_{atm}$')
-plt.axhline(P1/1e3, color='r', ls='--', label='$P_1$')
-plt.axhline(P3/1e3, color='g', ls='--', label='$P_3$')
-plt.xlabel('tijd [s]')
-plt.ylabel('druk [kPa]')
-plt.legend()
-plt.show()
-```
-
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-
-data = np.genfromtxt('bb_15_25_3bar.csv', delimiter=',', skip_header=1, invalid_raise=False)
-t = data[:, 0] / 1000      # tijd [s]
-U = data[:, 1]             # sensorwaarde [ADC]
 T = data[:, 2]             # temperatuur [°C]
 
-# fout weggeschreven regels eruit (tijd moet steeds toenemen)
-goed = np.ones(len(t), bool)
-goed[1:] = np.diff(t) > 0
-t, U, T = t[goed], U[goed], T[goed]
-
 # ijking van de druksensor (uit de meting met de spuit)
-a, b = 501, -25332         # P = a U + b  [Pa]
 P = a * U + b
 
 # drie drukken: gemiddelde over een stabiel stuk
-s_atm = t < 127                      # voor het oppompen
-s_1   = (t > 400) & (t < 547.5)      # vlak voor het leeglaten
-s_3   = (t > 570) & (t < 659)        # plateau na het sluiten
+s_atm = t < 105                      # voor het oppompen
+s_1   = (t > 225) & (t < 231.6)      # vlak voor het leeglaten
+s_3   = (t > 240) & (t < 256)        # plateau na het sluiten
 
 P_atm, P1, P3 = np.mean(P[s_atm]), np.mean(P[s_1]), np.mean(P[s_3])
 
-# onzekerheid in elke druk: aflezing (1 ADC-stap) en spreiding van het gemiddelde
-def u_druk(s):
-    return np.sqrt(a**2 + (np.std(P[s], ddof=1)/np.sqrt(np.sum(s)))**2)
-
-u_Patm, u_P1, u_P3 = u_druk(s_atm), u_druk(s_1), u_druk(s_3)
 
 # gamma en foutvoortplanting
 A = np.log(P1/P_atm)
 B = np.log(P1/P3)
 gamma = A / B
-u_gamma = np.sqrt(((B - A)/(B**2 * P1) * u_P1)**2 +
-                  (1/(B * P_atm) * u_Patm)**2 +
-                  (A/(B**2 * P3) * u_P3)**2)
 
-print(f"P_atm = {P_atm/1e3:.1f} ± {u_Patm/1e3:.1f} kPa")
-print(f"P1    = {P1/1e3:.1f} ± {u_P1/1e3:.1f} kPa")
-print(f"P3    = {P3/1e3:.1f} ± {u_P3/1e3:.1f} kPa")
-print(f"gamma = {gamma:.3f} ± {u_gamma:.3f}")
+
+print(f"gamma = {gamma:.3f}")
 
 # druk en temperatuur tegen de tijd
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 6), sharex=True)
@@ -412,13 +356,7 @@ t = data[:, 0] / 1000      # tijd [s]
 U = data[:, 1]             # sensorwaarde [ADC]
 T = data[:, 2]             # temperatuur [°C]
 
-# fout weggeschreven regels eruit (tijd moet steeds toenemen)
-goed = np.ones(len(t), bool)
-goed[1:] = np.diff(t) > 0
-t, U, T = t[goed], U[goed], T[goed]
-
 # ijking van de druksensor (uit de meting met de spuit)
-a, b = 501, -25332         # P = a U + b  [Pa]
 P = a * U + b
 
 # drie drukken: gemiddelde over een stabiel stuk
@@ -428,24 +366,14 @@ s_3   = (t > 570) & (t < 659)        # plateau na het sluiten
 
 P_atm, P1, P3 = np.mean(P[s_atm]), np.mean(P[s_1]), np.mean(P[s_3])
 
-# onzekerheid in elke druk: aflezing (1 ADC-stap) en spreiding van het gemiddelde
-def u_druk(s):
-    return np.sqrt(a**2 + (np.std(P[s], ddof=1)/np.sqrt(np.sum(s)))**2)
-
-u_Patm, u_P1, u_P3 = u_druk(s_atm), u_druk(s_1), u_druk(s_3)
 
 # gamma en foutvoortplanting
 A = np.log(P1/P_atm)
 B = np.log(P1/P3)
 gamma = A / B
-u_gamma = np.sqrt(((B - A)/(B**2 * P1) * u_P1)**2 +
-                  (1/(B * P_atm) * u_Patm)**2 +
-                  (A/(B**2 * P3) * u_P3)**2)
 
-print(f"P_atm = {P_atm/1e3:.1f} ± {u_Patm/1e3:.1f} kPa")
-print(f"P1    = {P1/1e3:.1f} ± {u_P1/1e3:.1f} kPa")
-print(f"P3    = {P3/1e3:.1f} ± {u_P3/1e3:.1f} kPa")
-print(f"gamma = {gamma:.3f} ± {u_gamma:.3f}")
+
+print(f"gamma = {gamma:.3f}")
 
 # druk en temperatuur tegen de tijd
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 6), sharex=True)
@@ -472,40 +400,23 @@ t = data[:, 0] / 1000      # tijd [s]
 U = data[:, 1]             # sensorwaarde [ADC]
 T = data[:, 2]             # temperatuur [°C]
 
-# fout weggeschreven regels eruit (tijd moet steeds toenemen)
-goed = np.ones(len(t), bool)
-goed[1:] = np.diff(t) > 0
-t, U, T = t[goed], U[goed], T[goed]
-
 # ijking van de druksensor (uit de meting met de spuit)
-a, b = 501, -25332         # P = a U + b  [Pa]
 P = a * U + b
 
 # drie drukken: gemiddelde over een stabiel stuk
-s_atm = t < 127                      # voor het oppompen
-s_1   = (t > 400) & (t < 547.5)      # vlak voor het leeglaten
-s_3   = (t > 570) & (t < 659)        # plateau na het sluiten
+s_atm = t < 48                       # voor het oppompen
+s_1   = (t > 150) & (t < 360)        # vlak voor het leeglaten
+s_3   = (t > 390) & (t < 463)        # plateau na het sluiten
 
 P_atm, P1, P3 = np.mean(P[s_atm]), np.mean(P[s_1]), np.mean(P[s_3])
 
-# onzekerheid in elke druk: aflezing (1 ADC-stap) en spreiding van het gemiddelde
-def u_druk(s):
-    return np.sqrt(a**2 + (np.std(P[s], ddof=1)/np.sqrt(np.sum(s)))**2)
-
-u_Patm, u_P1, u_P3 = u_druk(s_atm), u_druk(s_1), u_druk(s_3)
 
 # gamma en foutvoortplanting
-A = np.log(P1/P_atm)
-B = np.log(P1/P3)
-gamma = A / B
-u_gamma = np.sqrt(((B - A)/(B**2 * P1) * u_P1)**2 +
-                  (1/(B * P_atm) * u_Patm)**2 +
-                  (A/(B**2 * P3) * u_P3)**2)
+L1 = np.log(P1/P_atm)
+L2 = np.log(P1/P3)
+gamma = L1 / L2
 
-print(f"P_atm = {P_atm/1e3:.1f} ± {u_Patm/1e3:.1f} kPa")
-print(f"P1    = {P1/1e3:.1f} ± {u_P1/1e3:.1f} kPa")
-print(f"P3    = {P3/1e3:.1f} ± {u_P3/1e3:.1f} kPa")
-print(f"gamma = {gamma:.3f} ± {u_gamma:.3f}")
+print(f"gamma = {gamma:.3f}")
 
 # druk en temperatuur tegen de tijd
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 6), sharex=True)
@@ -522,3 +433,5 @@ ax2.set_ylabel('temperatuur [°C]')
 plt.tight_layout()
 plt.show()
 ```
+
+Onze gevonden waarden is ongeveer 1,2 dit is onder de literatuur waarde. Dat komt omdat de temperattur constanter bleef dan wij verwacht hadden in de brandblusser waardoor de stelling: $T_1 = T_3 = T_{atm}$ niet geldig is. Wel is ons antwoord in de goede oorde van grootheid dus waarschijnlijk zit er een systematische fout van de temperatuur in onze opstelling en is de rest van het experiment wel geldig
